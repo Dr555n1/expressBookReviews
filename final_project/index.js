@@ -12,11 +12,15 @@ app.use("/customer",session({secret:"fingerprint_customer",resave: true, saveUni
 
 app.use("/customer/auth/*", function auth(req,res,next){
 //Write the authenication mechanism here
-    console.log(req.session);
-    console.log(req.session.authentication);
-    if (req.session.authentication)
+    //console.log(req.headers);
+    //console.log(req.headers.authorization);
+    if (req.headers.authorization)
     {
-        let jwtToken = req.session.authentication['jwtToken'];
+        //console.log("header found");
+        //console.log(req.headers.authorization['jwtToken']);
+        //console.log(req.headers.authorization.replace('Bearer ', ''));
+        let jwtToken = req.headers.authorization.replace('Bearer ', '');
+        console.log(jwtToken);
         jwt.verify(jwtToken, "access", (err,user)=>{
             if(err)
             {
@@ -24,6 +28,7 @@ app.use("/customer/auth/*", function auth(req,res,next){
             }
             else
             {
+                console.log("user",user);
                 req.user =user;
                 next();
             }

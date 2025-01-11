@@ -46,10 +46,12 @@ regd_users.post("/login", (req,res) => {
   let reg_password = req.query.password;
   if (authenticatedUser(reg_username,reg_password))
   {
+    console.log("Start login");
     let jwtToken = jwt.sign({data:reg_username}, 'access',{expiresIn:60*60});
-    console.log(jwtToken);
     req.session.authorization = {jwtToken};
-    console.log(req.session.authentication);
+    console.log(req.session.authorization)
+
+    console.log("End Login");
     res.send("Loggin Successful");
   }
   else
@@ -69,15 +71,28 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
    let book=books[book_isbn];
    let session_user = req.session.username;
    let new_review = req.query.review;
-   let rev = {user:session_user,review:new_review}
-   let filtered_review = Object.values(book).filter((review) => review.user === session_user);
-   if (filtered_review.length>0)
-   {
-    console.log(filtered_review);
-   }
+   let user_review = {user:session_user,review:new_review}
+   //console.log(user_review);
 
    book.reviews = user_review;
+   return res.status(201).json({message:"Review added successfully"})
 });
+
+// Delete a book review
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+    //Write your code here
+    //return res.status(300).json({message: "Yet to be implemented"});
+    //console.log(req.params.isbn);
+  
+     let book_isbn = req.params.isbn;
+     let book=books[book_isbn];
+     let session_user = req.session.username;
+     let no_review = {}
+     console.log("review delete by user",session_user);
+     book.reviews = no_review;
+     return res.status(201).json({message:"Reviews has been delete"})
+  });
+  
 
 module.exports.authenticated = regd_users;
 module.exports.isValid = isValid;
