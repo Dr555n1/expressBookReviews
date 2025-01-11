@@ -12,6 +12,28 @@ app.use("/customer",session({secret:"fingerprint_customer",resave: true, saveUni
 
 app.use("/customer/auth/*", function auth(req,res,next){
 //Write the authenication mechanism here
+    console.log(req.session);
+    console.log(req.session.authentication);
+    if (req.session.authentication)
+    {
+        let jwtToken = req.session.authentication['jwtToken'];
+        jwt.verify(jwtToken, "access", (err,user)=>{
+            if(err)
+            {
+                return res.status(401).json({message: "No Authorized"});
+            }
+            else
+            {
+                req.user =user;
+                next();
+            }
+        });
+
+    }
+    else
+    {
+        return res.status(401).json({message: "Login Info Not Available, No Authorized"});
+    }
 });
  
 const PORT =5000;
